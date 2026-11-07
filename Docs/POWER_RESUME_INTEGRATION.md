@@ -83,4 +83,4 @@ With Klipper connected, use:
 
 ## Current delivery status
 
-A feature branch was created for this work. This documentation is an engineering design only. The package, plugin, settings plumbing and limited macro hooks have been committed to this feature branch. Checkpointing remains disabled by default. No Yocto build or physical printer test has been run. This is not yet a full print-resume implementation and must not be represented as one until recovery-file generation, safe homing/motion strategy and bench tests are complete.
+The package, plugin, settings plumbing and limited macro hooks are committed to the feature branch and proposed in draft PR #2. Checkpointing remains disabled by default. No Yocto build or physical printer test has been run. This is not yet a full print-resume implementation and must not be represented as one until recovery-file generation, safe homing/motion strategy and bench tests are complete.
