@@ -182,11 +182,11 @@ class PowerResume:
             self.last_write = eventtime
             self.last_error = None
         except Exception as exc:
-            self.last_error = str(exc)
-            if self.last_error != str(exc):
+            error_message = str(exc)
+            if self.last_error != error_message:
                 self.gcode.respond_info(
-                    "COSMOS Power Resume journal warning: %s" % exc)
-            self.last_error = str(exc)
+                    "COSMOS Power Resume journal warning: %s" % error_message)
+            self.last_error = error_message
         return eventtime + self.interval
 
     def _validate_checkpoint(self):
