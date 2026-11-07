@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1800" viewBox="0 0 900 1800">
+<defs>
+<radialGradient id="space"><stop stop-color="#102e72"/><stop offset=".42" stop-color="#061735"/><stop offset="1" stop-color="#010611"/></radialGradient>
+<radialGradient id="nebula"><stop stop-color="#24aaff" stop-opacity=".88"/><stop offset=".35" stop-color="#174bba" stop-opacity=".52"/><stop offset=".72" stop-color="#7b28d8" stop-opacity=".22"/><stop offset="1" stop-color="#07142e" stop-opacity="0"/></radialGradient>
+<linearGradient id="planet" x2="0" y2="1"><stop stop-color="#36c8ff"/><stop offset=".12" stop-color="#1262b7"/><stop offset=".45" stop-color="#071b3b"/><stop offset="1" stop-color="#01040b"/></linearGradient>
+<filter id="glow"><feGaussianBlur stdDeviation="12"/></filter><filter id="soft"><feGaussianBlur stdDeviation="42"/></filter>
+</defs>
+<rect width="900" height="1800" fill="url(#space)"/><ellipse cx="620" cy="800" rx="360" ry="600" fill="url(#nebula)" filter="url(#soft)"/>
+<path d="M-100 1160 C170 980 300 880 460 650 S740 390 1000 120" fill="none" stroke="#1479ff" stroke-width="180" opacity=".14" filter="url(#soft)"/>
+<path d="M-80 1200 C190 1010 310 900 470 680 S760 390 990 150" fill="none" stroke="#29baff" stroke-width="34" opacity=".18" filter="url(#glow)"/>
+<ellipse cx="790" cy="260" rx="140" ry="90" fill="url(#nebula)" transform="rotate(-28 790 260)"/>
+<g fill="#d9f4ff">
+<circle cx="78" cy="90" r="2"/><circle cx="190" cy="210" r="1.8"/><circle cx="310" cy="75" r="2.4"/><circle cx="440" cy="190" r="1.4"/><circle cx="570" cy="85" r="2"/><circle cx="710" cy="160" r="1.7"/><circle cx="840" cy="65" r="2.2"/>
+<circle cx="115" cy="390" r="1.7"/><circle cx="260" cy="480" r="2.3"/><circle cx="390" cy="350" r="1.5"/><circle cx="530" cy="510" r="2.1"/><circle cx="690" cy="430" r="1.5"/><circle cx="820" cy="570" r="2.2"/>
+<circle cx="65" cy="720" r="1.6"/><circle cx="210" cy="830" r="2"/><circle cx="350" cy="700" r="1.4"/><circle cx="510" cy="900" r="2.5"/><circle cx="730" cy="790" r="1.8"/><circle cx="850" cy="960" r="1.6"/>
+<circle cx="120" cy="1050" r="2"/><circle cx="290" cy="1170" r="1.5"/><circle cx="460" cy="1080" r="2"/><circle cx="650" cy="1190" r="1.5"/><circle cx="800" cy="1100" r="2.2"/>
+<circle cx="80" cy="1330" r="1.5"/><circle cx="250" cy="1430" r="2"/><circle cx="430" cy="1320" r="1.6"/><circle cx="610" cy="1460" r="2.1"/><circle cx="820" cy="1360" r="1.5"/>
+</g>
+<g fill="#7bdcff" filter="url(#glow)" opacity=".9"><circle cx="260" cy="480" r="9"/><circle cx="530" cy="510" r="10"/><circle cx="510" cy="900" r="11"/><circle cx="460" cy="1080" r="8"/></g>
+<path d="M-80 1500 Q300 1280 980 1550 L980 1840 L-80 1840Z" fill="url(#planet)"/>
+<path d="M-80 1500 Q300 1280 980 1550" fill="none" stroke="#24baff" stroke-width="8" opacity=".9"/>
+<path d="M-80 1500 Q300 1280 980 1550" fill="none" stroke="#7ce5ff" stroke-width="24" opacity=".28" filter="url(#glow)"/>
+<g fill="#b8eaff" opacity=".18"><path d="M0 1580l130-60 80 30 70-55 90 50-120 70-150 20z"/><path d="M430 1530l100-35 90 40 100-15 140 60-160 35-170-25z"/></g>
+</svg>
