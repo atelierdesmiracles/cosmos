@@ -145,7 +145,7 @@ class PowerResume:
                 position = int(vsd.get_file_position())
             else:
                 position = int(vsd_status.get("file_position", 0))
-            if not file_path or position <= 0 or position == self.last_position:
+            if not file_path or position <= 0 or (position == self.last_position and not force):
                 return eventtime + self.interval
 
             real_path = os.path.realpath(file_path)
@@ -235,9 +235,12 @@ class PowerResume:
         if not self.enabled:
             gcmd.respond_info("COSMOS Power Resume: checkpointing is disabled")
             return
+        previous_write = self.last_write
         self._sample(self.reactor.monotonic(), force=True)
         if self.last_error:
             raise gcmd.error("Power Resume checkpoint failed: %s" % self.last_error)
+        if self.last_write == previous_write:
+            raise gcmd.error("No active virtual SD file to checkpoint")
         gcmd.respond_info("COSMOS Power Resume: checkpoint saved")
 
     def cmd_CHECK(self, gcmd):
