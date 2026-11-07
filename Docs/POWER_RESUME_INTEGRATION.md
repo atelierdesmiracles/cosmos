@@ -1,6 +1,6 @@
 # COSMOS Power Resume integration design
 
-Status: integration scaffold / engineering specification. Not yet enabled in the production image.
+Status: first implementation committed on an isolated feature branch. Package is included in the image recipe but checkpointing is disabled by default. No Yocto build or physical printer test has been run.
 
 ## Goal
 
@@ -39,6 +39,17 @@ Target: https://github.com/atelierdesmiracles/cosmos
 11. Validate VIRTUAL_SDCARD in the installed Kalico version and the actual configured virtual_sdcard path. The upstream project requires VIRTUAL_SDCARD; this target repo has not yet been demonstrated to include it in an active printer config.
 12. Test all failure paths: empty journal, partial journal write, missing file, file replaced/renamed, corrupted checksum, stale record, MCU disconnect, power loss, file end, print completion, cancel, pause, M600, runout, tool change/AFC and mesh/homing configuration.
 
+## Implemented in the feature branch
+
+- Added a native Kalico extra module at `meta-opencentauri/recipes-apps/power-resume/files/power_resume.py`.
+- Added an optional Yocto recipe `power-resume_0.1.bb` and included the package in `cosmos-image-base.bb`.
+- Added `power_resume_enabled = False` to both Centauri Carbon machine defaults and a matching validator in `config_manager.py`.
+- Extended `build-klipper-var-config.sh` to generate the `[power_resume]` section at startup.
+- Added `POWER_RESUME_CLEAR` at print start and print end so a previous print checkpoint is not offered after a new job or a normal end/cancel.
+- Added native G-code commands: `POWER_RESUME_STATUS`, `POWER_RESUME_CHECK`, and `POWER_RESUME_CLEAR`.
+- The module records file path, file identity metadata, byte offset, G-code position, coordinate/extrusion modes, speed factors and heater targets. Writes use a checksum, temporary file, atomic rename and fsync.
+- The module is disabled by default and does not home, heat, move, generate a restarted G-code file or resume automatically.
+
 ## Proposed target layout (not committed yet)
 
 - meta-opencentauri/recipes-apps/power-resume/power-resume_0.1.bb
@@ -48,6 +59,16 @@ Target: https://github.com/atelierdesmiracles/cosmos
 - Documentation: Docs/POWER_RESUME.md
 
 The recipe should install files into COSMOS-managed locations and rely only on available base tools/runtime already in the image. Avoid adding Python dependencies unless required.
+
+## How to enable checkpointing for bench testing
+
+Set `power_resume_enabled = True` in `/etc/klipper/config/cosmos.conf`, then reboot the printer. This setting is not yet exposed as a polished Mainsail control. Checkpointing is disabled by default. Confirm that `/user-resource` is persistent on the exact hardware/image before enabling it.
+
+With Klipper connected, use:
+
+- `POWER_RESUME_STATUS` — report whether a checkpoint exists.
+- `POWER_RESUME_CHECK` — validate the journal and unchanged source G-code file. This does not resume.
+- `POWER_RESUME_CLEAR` — delete the checkpoint.
 
 ## Integration gates before production
 
@@ -62,4 +83,4 @@ The recipe should install files into COSMOS-managed locations and rely only on a
 
 ## Current delivery status
 
-A feature branch was created for this work. This documentation is an engineering design only. No package, macro, runtime service or enabled image feature has been committed. No Yocto build or physical printer test has been run. Do not call the feature complete or safe to use until all gates pass.
+A feature branch was created for this work. This documentation is an engineering design only. The package, plugin, settings plumbing and limited macro hooks have been committed to this feature branch. Checkpointing remains disabled by default. No Yocto build or physical printer test has been run. This is not yet a full print-resume implementation and must not be represented as one until recovery-file generation, safe homing/motion strategy and bench tests are complete.
