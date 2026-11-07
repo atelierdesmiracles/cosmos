@@ -46,7 +46,8 @@ Target: https://github.com/atelierdesmiracles/cosmos
 - Added `power_resume_enabled = False` to both Centauri Carbon machine defaults and a matching validator in `config_manager.py`.
 - Extended `build-klipper-var-config.sh` to generate the `[power_resume]` section at startup.
 - Added `POWER_RESUME_CLEAR` at print start and print end so a previous print checkpoint is not offered after a new job or a normal end/cancel.
-- Added native G-code commands: `POWER_RESUME_STATUS`, `POWER_RESUME_CHECK`, and `POWER_RESUME_CLEAR`.
+- Added native G-code commands: `POWER_RESUME_STATUS`, `POWER_RESUME_CHECK`, `POWER_RESUME_SAVE`, and `POWER_RESUME_CLEAR`.
+- The existing COSMOS `PAUSE` macro requests an immediate checkpoint before its parking/retraction sequence.
 - The module records file path, file identity metadata, byte offset, G-code position, coordinate/extrusion modes, speed factors and heater targets. Writes use a checksum, temporary file, atomic rename and fsync.
 - The module is disabled by default and does not home, heat, move, generate a restarted G-code file or resume automatically.
 
@@ -68,6 +69,7 @@ With Klipper connected, use:
 
 - `POWER_RESUME_STATUS` — report whether a checkpoint exists.
 - `POWER_RESUME_CHECK` — validate the journal and unchanged source G-code file. This does not resume.
+- `POWER_RESUME_SAVE` — force a checkpoint while a virtual SD file is loaded (also called by the COSMOS pause macro).
 - `POWER_RESUME_CLEAR` — delete the checkpoint.
 
 ## Integration gates before production
