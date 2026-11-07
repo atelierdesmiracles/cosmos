@@ -50,7 +50,7 @@ Target: https://github.com/atelierdesmiracles/cosmos
 - The module records file path, file identity metadata, byte offset, G-code position, coordinate/extrusion modes, speed factors and heater targets. Writes use a checksum, temporary file, atomic rename and fsync.
 - The module is disabled by default and does not home, heat, move, generate a restarted G-code file or resume automatically.
 
-## Proposed target layout (not committed yet)
+## Remaining implementation scope
 
 - meta-opencentauri/recipes-apps/power-resume/power-resume_0.1.bb
 - meta-opencentauri/recipes-apps/power-resume/files/power_resume.py (small helper / journal format)
@@ -74,7 +74,7 @@ With Klipper connected, use:
 
 - Confirm mainboard persistent storage path and write endurance.
 - Confirm VIRTUAL_SDCARD is enabled in actual machine config at runtime.
-- Confirm how Kalico exposes file_position and whether file_position reliably identifies the next byte/command after restart.
+- Confirmed in the current Kalico `virtual_sdcard.py`: status exposes `file_path`, `is_active`, and `file_position`; the implementation now reads these via `get_status()`. Still verify the behavior on the exact COSMOS pinned Kalico commit and a physical print.
 - Confirm which process executes scripts, its UID, permissions and SELinux/AppArmor status (if any).
 - Confirm COSMOS config generation preserves custom printer.cfg snippets.
 - Confirm actual Centauri Carbon homing, mesh, offsets, fan, heater and AFC behaviors.
