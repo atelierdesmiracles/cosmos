@@ -85,6 +85,9 @@ class PowerResume:
         self.gcode.register_command("POWER_RESUME_CLEAR",
                                     self.cmd_CLEAR,
                                     desc="Clear COSMOS power-resume journal")
+        self.gcode.register_command("POWER_RESUME_SAVE",
+                                    self.cmd_SAVE,
+                                    desc="Force a COSMOS power-resume checkpoint")
         self.gcode.register_command("POWER_RESUME_CHECK",
                                     self.cmd_CHECK,
                                     desc="Validate the saved COSMOS recovery checkpoint")
@@ -116,7 +119,7 @@ class PowerResume:
         except Exception:
             pass
 
-    def _sample(self, eventtime):
+    def _sample(self, eventtime, force=False):
         if not self.enabled:
             return self.reactor.NEVER
         try:
@@ -134,11 +137,14 @@ class PowerResume:
             if vsd is None:
                 return eventtime + self.interval
             vsd_status = vsd.get_status(eventtime)
-            if not vsd_status.get("is_active", False):
+            if not force and not vsd_status.get("is_active", False):
                 return eventtime + self.interval
 
             file_path = vsd_status.get("file_path")
-            position = int(vsd_status.get("file_position", 0))
+            if force and getattr(vsd, "is_cmd_from_sd", lambda: False)():
+                position = int(vsd.get_file_position())
+            else:
+                position = int(vsd_status.get("file_position", 0))
             if not file_path or position <= 0 or position == self.last_position:
                 return eventtime + self.interval
 
@@ -224,6 +230,15 @@ class PowerResume:
             gcmd.respond_info("COSMOS Power Resume: no checkpoint available")
         except Exception as exc:
             gcmd.respond_info("COSMOS Power Resume: invalid checkpoint: %s" % exc)
+
+    def cmd_SAVE(self, gcmd):
+        if not self.enabled:
+            gcmd.respond_info("COSMOS Power Resume: checkpointing is disabled")
+            return
+        self._sample(self.reactor.monotonic(), force=True)
+        if self.last_error:
+            raise gcmd.error("Power Resume checkpoint failed: %s" % self.last_error)
+        gcmd.respond_info("COSMOS Power Resume: checkpoint saved")
 
     def cmd_CHECK(self, gcmd):
         try:
