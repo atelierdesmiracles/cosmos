@@ -22,6 +22,7 @@ CORE_IMAGE_EXTRA_INSTALL += "\
     linux-firmware-rtl8821 \
     aic8800 \
     kalico \
+    power-resume \
     moonraker \
     addon \
     mainsail \
