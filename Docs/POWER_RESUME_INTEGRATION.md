@@ -1,6 +1,6 @@
 # COSMOS Power Resume integration design
 
-Status: first implementation committed on an isolated feature branch. Package is included in the image recipe but checkpointing is disabled by default. No Yocto build or physical printer test has been run.
+Status: first implementation committed on an isolated feature branch. Package is included in the image recipe but checkpointing is disabled by default. No Yocto build or physical printer test has been run. A draft pull request has been opened to invoke the repository's dual-machine build workflow.
 
 ## Goal
 
@@ -27,16 +27,16 @@ Target: https://github.com/atelierdesmiracles/cosmos
 ## Integration strategy
 
 1. Do not import KIAUH, the T9Air interactive installer, a permanent daemon, or gcode_shell_command solely to support recovery.
-2. Build an opt-in COSMOS package or layer contribution. No new package should be added to CORE_IMAGE_EXTRA_INSTALL until resource and compatibility validation is complete.
+2. Package the module as an opt-in COSMOS component. It is included in the image, but its timer and journal writes remain disabled by default until persistent storage and runtime behavior are verified.
 3. Store state on persistent writable storage, not the read-only root filesystem or a volatile /tmp directory. Confirm mount semantics and durability on both Centauri Carbon hardware variants before selecting the final path.
-4. Treat print progress as a journal. A single last-position record is not enough: use atomic write/rename, include version/schema, print file identity, file position, XYZ/E, speed/extrusion mode, active tool, temperatures, coordinate modes and a checksum. Bound write frequency to avoid flash wear.
+4. Treat print progress as a journal. A single last-position record is not enough: use atomic write/rename, include version/schema, print file identity, file position, XYZ/E, speed/extrusion mode, temperatures, coordinate modes and a checksum. Active tool/AFC state remains to be added. Bound write frequency to avoid flash wear.
 5. Add logging to G-code through a non-invasive, deterministic preprocessing step or a Klipper-native mechanism. Never mutate the only original uploaded G-code file; write a separate prepared file and preserve original metadata. Reconcile byte offsets with the exact file Klipper is executing after Moonraker file processing.
 6. Recovery generation must be a separate action and require a valid journal, matching original file identity, valid position within file size, and known extrusion/coordinate modes.
 7. Do not auto-home blindly after power loss. COSMOS has homing_override and load-cell probing; any resume path must be specifically adapted to Centauri Carbon homing and validated on a test machine. Never move the gantry until the operator confirms the bed/toolhead are clear and the machine is in a safe state.
 8. Heat up and move only after explicit operator confirmation. Check heaters, thermistors, fans, MCU connectivity, axes, toolhead, filament, bed mesh and compatible print file. Do not restore a stale chamber/extruder target without review.
 9. Do not override COSMOS PRINT_START, PRINT_END, PAUSE, RESUME or CANCEL_PRINT blindly. They are substantial custom macros, including bed mesh, calibration, filament sensor, toolhead cleanup, fan state, skew and AFC behavior. Add a narrow recovery-specific entrypoint, and call shared routines only after exact behavior is verified.
 10. Moonraker/Mainsail should expose state and operator actions, not run recovery logic itself. Keep the core implementation local to the Klipper configuration and small system helper.
-11. Validate VIRTUAL_SDCARD in the installed Kalico version and the actual configured virtual_sdcard path. The upstream project requires VIRTUAL_SDCARD; this target repo has not yet been demonstrated to include it in an active printer config.
+11. The target machine configs for both Centauri Carbon variants include `[virtual_sdcard]` with path `/etc/klipper/gcodes`. The module reads the live `virtual_sdcard.get_status()` API. Verify the symlink/mount resolves to persistent storage on each installed image.
 12. Test all failure paths: empty journal, partial journal write, missing file, file replaced/renamed, corrupted checksum, stale record, MCU disconnect, power loss, file end, print completion, cancel, pause, M600, runout, tool change/AFC and mesh/homing configuration.
 
 ## Implemented in the feature branch
@@ -53,13 +53,11 @@ Target: https://github.com/atelierdesmiracles/cosmos
 
 ## Remaining implementation scope
 
-- meta-opencentauri/recipes-apps/power-resume/power-resume_0.1.bb
-- meta-opencentauri/recipes-apps/power-resume/files/power_resume.py (small helper / journal format)
-- meta-opencentauri/recipes-apps/power-resume/files/power-resume.cfg (only opt-in macros)
-- meta-opencentauri/recipes-apps/power-resume/files/power-resume-init-check.sh (optional startup validation; no long-running service)
-- Documentation: Docs/POWER_RESUME.md
-
-The recipe should install files into COSMOS-managed locations and rely only on available base tools/runtime already in the image. Avoid adding Python dependencies unless required.
+- Generate a recovery G-code artifact from a validated checkpoint without modifying the original upload.
+- Implement a Centauri-specific, operator-confirmed homing and safe-position procedure.
+- Reconcile file offsets, G-code parser state, extrusion mode, offsets, mesh, AFC/tool selection and slicer start/end behavior.
+- Expose recovery review and confirmation in Mainsail/COSMOS UI.
+- Add automated unit tests and complete Yocto builds for both hardware variants.
 
 ## How to enable checkpointing for bench testing
 
