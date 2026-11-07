@@ -12,6 +12,8 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI = " \
     https://github.com/mainsail-crew/mainsail/releases/download/v${PV}/mainsail.zip;subdir=mainsail \
     file://default.json \
+    file://custom.css \
+    file://cosmos-starfield.svg \
 "
 SRC_URI[sha256sum] = "c4d9d96f89851c6ae0709c2f20725447f3fe8c57cf193869b0083441bd93378a"
 
@@ -39,9 +41,13 @@ do_install() {
     # Existing Mainsail settings in Moonraker's database remain unchanged.
     install -d ${D}${sysconfdir}/klipper/config/.theme
     install -m 0644 ${UNPACKDIR}/default.json ${D}${sysconfdir}/klipper/config/.theme/default.json
+    install -m 0644 ${WORKDIR}/custom.css ${D}${sysconfdir}/klipper/config/.theme/custom.css
+    install -m 0644 ${WORKDIR}/cosmos-starfield.svg ${D}${sysconfdir}/klipper/config/.theme/cosmos-starfield.svg
 }
 
 FILES:${PN} = " \
     /var/www/mainsail \
     ${sysconfdir}/klipper/config/.theme/default.json \
+    ${sysconfdir}/klipper/config/.theme/custom.css \
+    ${sysconfdir}/klipper/config/.theme/cosmos-starfield.svg \
 "
