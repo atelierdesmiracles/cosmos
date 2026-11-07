@@ -5,7 +5,7 @@ HOMEPAGE = "https://github.com/mainsail-crew/mainsail"
 LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://index.html;md5=ec818674470b1a5a042b3c94b6a3f05e"
 
-PR = "r1"
+PR = "r2"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
