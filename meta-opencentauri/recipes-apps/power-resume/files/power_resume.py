@@ -131,11 +131,14 @@ class PowerResume:
                     return eventtime + self.interval
 
             vsd = self.printer.lookup_object("virtual_sdcard", None)
-            if vsd is None or not getattr(vsd, "is_active", False):
+            if vsd is None:
+                return eventtime + self.interval
+            vsd_status = vsd.get_status(eventtime)
+            if not vsd_status.get("is_active", False):
                 return eventtime + self.interval
 
-            file_path = getattr(vsd, "file_path", None)
-            position = int(getattr(vsd, "file_position", 0))
+            file_path = vsd_status.get("file_path")
+            position = int(vsd_status.get("file_position", 0))
             if not file_path or position <= 0 or position == self.last_position:
                 return eventtime + self.interval
 
