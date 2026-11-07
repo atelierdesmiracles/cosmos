@@ -5,7 +5,6 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-3.0-only;md5=1ebbd3e34237af
 
 SRC_URI = " \
     file://power_resume.py \
-    file://power-resume.cfg \
 "
 
 S = "${WORKDIR}"
@@ -16,11 +15,8 @@ do_install() {
     install -d ${D}${datadir}/klipper/klippy/extras
     install -m 0644 ${WORKDIR}/power_resume.py ${D}${datadir}/klipper/klippy/extras/power_resume.py
 
-    install -d ${D}${sysconfdir}/klipper/config/klipper-readonly
-    install -m 0644 ${WORKDIR}/power-resume.cfg ${D}${sysconfdir}/klipper/config/klipper-readonly/power-resume.cfg
 }
 
 FILES:${PN} += " \
     ${datadir}/klipper/klippy/extras/power_resume.py \
-    ${sysconfdir}/klipper/config/klipper-readonly/power-resume.cfg \
 "
