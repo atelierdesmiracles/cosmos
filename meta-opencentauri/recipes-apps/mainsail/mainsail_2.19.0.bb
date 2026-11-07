@@ -41,8 +41,8 @@ do_install() {
     # Existing Mainsail settings in Moonraker's database remain unchanged.
     install -d ${D}${sysconfdir}/klipper/config/.theme
     install -m 0644 ${UNPACKDIR}/default.json ${D}${sysconfdir}/klipper/config/.theme/default.json
-    install -m 0644 ${WORKDIR}/custom.css ${D}${sysconfdir}/klipper/config/.theme/custom.css
-    install -m 0644 ${WORKDIR}/cosmos-starfield.svg ${D}${sysconfdir}/klipper/config/.theme/cosmos-starfield.svg
+    install -m 0644 ${UNPACKDIR}/custom.css ${D}${sysconfdir}/klipper/config/.theme/custom.css
+    install -m 0644 ${UNPACKDIR}/cosmos-starfield.svg ${D}${sysconfdir}/klipper/config/.theme/cosmos-starfield.svg
 }
 
 FILES:${PN} = " \
