@@ -120,6 +120,16 @@ class PowerResume:
         if not self.enabled:
             return self.reactor.NEVER
         try:
+            print_stats = self.printer.lookup_object("print_stats", None)
+            if print_stats is not None:
+                print_state = print_stats.get_status(eventtime).get("state")
+                if print_state in ("complete", "cancelled", "error"):
+                    if os.path.exists(self.path):
+                        os.unlink(self.path)
+                    self.previous_checkpoint = None
+                    self.last_position = -1
+                    return eventtime + self.interval
+
             vsd = self.printer.lookup_object("virtual_sdcard", None)
             if vsd is None or not getattr(vsd, "is_active", False):
                 return eventtime + self.interval
@@ -170,8 +180,10 @@ class PowerResume:
             self.last_error = None
         except Exception as exc:
             self.last_error = str(exc)
-            self.gcode.respond_info(
-                "COSMOS Power Resume journal warning: %s" % exc)
+            if self.last_error != str(exc):
+                self.gcode.respond_info(
+                    "COSMOS Power Resume journal warning: %s" % exc)
+            self.last_error = str(exc)
         return eventtime + self.interval
 
     def _validate_checkpoint(self):
