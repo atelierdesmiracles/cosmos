@@ -126,7 +126,7 @@ class PowerResume:
             print_stats = self.printer.lookup_object("print_stats", None)
             if print_stats is not None:
                 print_state = print_stats.get_status(eventtime).get("state")
-                if print_state in ("complete", "cancelled", "error"):
+                if print_state in ("complete", "cancelled"):
                     if os.path.exists(self.path):
                         os.unlink(self.path)
                     self.previous_checkpoint = None
