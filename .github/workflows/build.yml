@@ -60,7 +60,11 @@ jobs:
         if: ${{ inputs.use_cache }}
         run: |
           mkdir -p ./build
-          cp -ar ${{ env.CACHE_DIR }}/* ./build
+          if [ -d "$CACHE_DIR" ] && [ -n "$(find "$CACHE_DIR" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
+            cp -a "$CACHE_DIR"/. ./build/
+          else
+            echo "No Yocto cache found at $CACHE_DIR; continuing with a clean build."
+          fi
 
       - name: Set distro version
         if: ${{ inputs.version != '' }}
@@ -92,25 +96,15 @@ jobs:
           name: centauri-carbon-1 Firmware
           path: build/tmp/deploy/images/centauri-carbon-1/cosmos-centauri-carbon-1.swu
 
-      - name: Upload build artifacts CC2 (SWU only)
-        uses: actions/upload-artifact@v4
-        with:
-          name: centauri-carbon-2 Firmware
-          path: build/tmp/deploy/images/centauri-carbon-2/cosmos-centauri-carbon-2.swu
-
-      - name: Upload build artifacts CC2 (Elegoo OTA bundle)
+      - name: Upload build artifacts CC2 (Elegoo OTA bundles)
         if: ${{ inputs.ota_bundles }}
         uses: actions/upload-artifact@v4
         with:
           name: centauri-carbon-2 Elegoo OTA
-          path: build/tmp/deploy/images/centauri-carbon-2/cc2_eeb001_*.zip.sig
-
-      - name: Upload build artifacts C2 (Elegoo OTA bundle)
-        if: ${{ inputs.ota_bundles }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: centauri-2 Elegoo OTA
-          path: build/tmp/deploy/images/centauri-carbon-2/c2_eeb001_*.zip.sig
+          path: |
+            build/tmp/deploy/images/centauri-carbon-2/cc2_eeb001_*.zip.sig
+            build/tmp/deploy/images/centauri-carbon-2/c2_eeb001_*.zip.sig
+          if-no-files-found: error
 
       - name: Upload build artifacts CC1
         if: ${{ inputs.upload_all_artifacts }}
@@ -129,9 +123,13 @@ jobs:
       - name: Write back cache
         if: ${{ inputs.write_back_cache }}
         run: |
-          rm -rf ${{ env.CACHE_DIR }}/*
-          cp -ar ./build/downloads ${{ env.CACHE_DIR }}
-          cp -ar ./build/sstate-cache ${{ env.CACHE_DIR }}
+          mkdir -p "$CACHE_DIR"
+          if [ -d ./build/downloads ]; then
+            cp -a ./build/downloads "$CACHE_DIR"/
+          fi
+          if [ -d ./build/sstate-cache ]; then
+            cp -a ./build/sstate-cache "$CACHE_DIR"/
+          fi
 
       - name: Clean workspace
         if: always()
