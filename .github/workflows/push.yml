@@ -45,11 +45,27 @@ jobs:
             exit 0
           fi
 
+          if ! gh release view 0.0.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create 0.0.0 \
+              --target "$GITHUB_SHA" \
+              --title "COSMOS Nightly" \
+              --notes "Automated nightly firmware build for commit $GITHUB_SHA." \
+              --prerelease \
+              --repo "$GITHUB_REPOSITORY"
+          fi
+
+          shopt -s nullglob
+          ota_files=(./firmware/*.zip.sig)
+          if (( ${#ota_files[@]} == 0 )); then
+            echo "No CC2 Elegoo OTA .zip.sig artifact was downloaded."
+            exit 1
+          fi
+
           gh release upload 0.0.0 \
             "./firmware/cosmos-centauri-carbon-1.swu" \
-            "./firmware/cosmos-centauri-carbon-2.swu" \
+            "${ota_files[@]}" \
             --clobber \
-            --repo OpenCentauri/cosmos
-          
-          gh api -X PATCH repos/${GITHUB_REPOSITORY}/git/refs/tags/0.0.0 \
-            -f sha=$GITHUB_SHA -F force=true
+            --repo "$GITHUB_REPOSITORY"
+
+          gh api -X PATCH "repos/${GITHUB_REPOSITORY}/git/refs/tags/0.0.0" \
+            -f sha="$GITHUB_SHA" -F force=true
